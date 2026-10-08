@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mochi, your desk pet</title>
+<style>
+:root{--bg:#e8efe6;--panel:#f6f9f4;--ink:#26342b;--sub:#5d6f63;--track:#cfdacb;--body:#fffdf8;--line:#26342b;--cheek:#f4a6b4;--hunger:#e59a4b;--fun:#5b9bd5;--energy:#7aa95c;--btn:#26342b;--btnink:#f6f9f4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#18211b;--panel:#202b23;--ink:#e7efe6;--sub:#9db0a2;--track:#34443a;--body:#f3efe4;--btn:#e7efe6;--btnink:#18211b}}
+:root[data-theme="dark"]{--bg:#18211b;--panel:#202b23;--ink:#e7efe6;--sub:#9db0a2;--track:#34443a;--body:#f3efe4;--btn:#e7efe6;--btnink:#18211b}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Nunito","Trebuchet MS",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:12px}
+.card{width:100%;max-width:380px;background:var(--panel);border-radius:28px;padding:16px 18px 18px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+#name{font:800 20px/1.2 "Nunito","Trebuchet MS",system-ui,sans-serif;background:none;border:0;color:var(--ink);width:60%;padding:2px 4px;border-radius:8px}
+#name:focus-visible,button:focus-visible,#pet:focus-visible{outline:3px solid var(--fun);outline-offset:2px}
+#age{font-size:13px;color:var(--sub)}
+.stage{position:relative;height:190px;display:flex;align-items:flex-end;justify-content:center;border-bottom:3px solid var(--track);margin:6px 0 12px}
+#pet{width:170px;height:160px;cursor:pointer;touch-action:manipulation;transform-origin:50% 100%;border-radius:50%}
+#pet.bounce{animation:bounce .6s ease-out}
+#pet.breathe{animation:breathe 3.4s ease-in-out infinite}
+@keyframes bounce{0%{transform:scale(1,1)}30%{transform:scale(1.12,.86)}60%{transform:scale(.94,1.1) translateY(-14px)}100%{transform:scale(1,1)}}
+@keyframes breathe{50%{transform:scale(1.02,.975)}}
+#say{position:absolute;top:4px;left:50%;transform:translateX(-50%);background:var(--bg);padding:6px 12px;border-radius:14px;font-size:14px;font-weight:700;white-space:nowrap;max-width:96%;overflow:hidden;text-overflow:ellipsis}
+.heart{position:absolute;bottom:90px;font-size:22px;pointer-events:none;animation:up 1s ease-out forwards}
+@keyframes up{to{transform:translateY(-70px);opacity:0}}
+.stat{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:10px;margin:7px 0;font-size:14px;font-weight:700}
+.bar{height:12px;background:var(--track);border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:8px;transition:width .5s}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+button{font:800 15px "Nunito","Trebuchet MS",system-ui,sans-serif;background:var(--btn);color:var(--btnink);border:0;border-radius:16px;padding:12px 4px;cursor:pointer;touch-action:manipulation}
+button:active{transform:scale(.96)}
+@media (prefers-reduced-motion:reduce){#pet.bounce,#pet.breathe,.heart{animation:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="top">
+    <input id="name" value="Mochi" maxlength="14" aria-label="Pet name">
+    <span id="age"></span>
+  </div>
+  <div class="stage">
+    <div id="say">Hi! Tap me.</div>
+    <svg id="pet" class="breathe" viewBox="0 0 170 160" role="button" tabindex="0" aria-label="Pet your pet">
+      <ellipse cx="85" cy="152" rx="56" ry="7" fill="#000" opacity=".12"/>
+      <path d="M85 14c-42 0-68 34-68 80 0 36 24 56 68 56s68-20 68-56c0-46-26-80-68-80z" fill="var(--body)" stroke="var(--line)" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M62 22c-4-10-12-14-18-12 2 8 6 14 12 18M108 22c4-10 12-14 18-12-2 8-6 14-12 18" fill="var(--body)" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="46" cy="104" rx="11" ry="7" fill="var(--cheek)" opacity=".85"/>
+      <ellipse cx="124" cy="104" rx="11" ry="7" fill="var(--cheek)" opacity=".85"/>
+      <g id="eyes"></g>
+      <path id="mouth" d="" fill="none" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="stat"><span>Hunger</span><div class="bar"><i id="b-h" style="background:var(--hunger)"></i></div></div>
+  <div class="stat"><span>Fun</span><div class="bar"><i id="b-f" style="background:var(--fun)"></i></div></div>
+  <div class="stat"><span>Energy</span><div class="bar"><i id="b-e" style="background:var(--energy)"></i></div></div>
+  <div class="btns">
+    <button id="feed">Feed</button>
+    <button id="play">Play</button>
+    <button id="sleep">Sleep</button>
+  </div>
+</main>
+<script>
+(function(){
+  var KEY="mochi-pet-v1";
+  var S={name:"Mochi",h:80,f:70,e:90,sleep:false,t:Date.now(),born:Date.now()};
+  try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(p&&typeof p.h==="number")S=Object.assign(S,p);}}catch(e){}
+  var $=function(id){return document.getElementById(id)};
+  var pet=$("pet"),eyes=$("eyes"),mouth=$("mouth"),say=$("say"),nameEl=$("name");
+  nameEl.value=S.name||"Mochi";
+  function clamp(v){return Math.max(0,Math.min(100,v))}
+  function step(dt){
+    if(S.sleep){S.e=clamp(S.e+0.15*dt);S.h=clamp(S.h-0.02*dt);S.f=clamp(S.f-0.01*dt);if(S.e>=100)S.sleep=false;}
+    else{S.h=clamp(S.h-0.05*dt);S.f=clamp(S.f-0.04*dt);S.e=clamp(S.e-0.025*dt);}
+  }
+  var gone=Math.min((Date.now()-S.t)/1000,6*3600);
+  if(gone>2)step(gone);
+  S.t=Date.now();
+  function save(){S.t=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  var talkUntil=0;
+  function talk(m,ms){say.textContent=m;talkUntil=Date.now()+(ms||3500)}
+  function mood(){
+    if(S.sleep)return"sleep";
+    var low=Math.min(S.h,S.f,S.e);
+    if(low<25)return"sad";
+    if(low>=60)return"happy";
+    return"ok";
+  }
+  function eyesSvg(m){
+    if(m==="sleep")return'<path d="M48 78q10 9 20 0M102 78q10 9 20 0" fill="none" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round"/>';
+    if(m==="happy")return'<path d="M48 82q10-14 20 0M102 82q10-14 20 0" fill="none" stroke="var(--line)" stroke-width="3.5" stroke-linecap="round"/>';
+    var r=m==="sad"?7:8.5;
+    return'<circle cx="58" cy="78" r="'+r+'" fill="var(--line)"/><circle cx="112" cy="78" r="'+r+'" fill="var(--line)"/><circle cx="60.5" cy="75" r="2.5" fill="#fff"/><circle cx="114.5" cy="75" r="2.5" fill="#fff"/>'+(m==="sad"?'<path d="M46 62l20 5M124 62l-20 5" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>':"");
+  }
+  var mouths={sleep:"M78 102q7 5 14 0",happy:"M70 98q15 20 30 0",ok:"M74 102q11 8 22 0",sad:"M72 110q13-12 26 0"};
+  var lastMood="";
+  function render(){
+    var m=mood();
+    if(m!==lastMood){eyes.innerHTML=eyesSvg(m);mouth.setAttribute("d",mouths[m]);lastMood=m;}
+    $("b-h").style.width=S.h+"%";$("b-f").style.width=S.f+"%";$("b-e").style.width=S.e+"%";
+    $("sleep").textContent=S.sleep?"Wake":"Sleep";
+    var d=Math.floor((Date.now()-S.born)/86400000);
+    $("age").textContent=d<1?"Born today":"Day "+(d+1);
+    if(Date.now()>talkUntil){
+      var msg={sleep:"Zzz...",happy:"Feeling great!",ok:"Doing okay.",sad:S.h<25?"So hungry...":S.f<25?"I'm bored...":"So sleepy..."}[m];
+      say.textContent=msg;
+    }
+  }
+  function bounce(){pet.classList.remove("bounce");void pet.getBoundingClientRect();pet.classList.add("bounce")}
+  function heart(sym){
+    var h=document.createElement("span");h.className="heart";h.textContent=sym||"♥";
+    h.style.left=(45+Math.random()*10)+"%";h.style.color="var(--cheek)";
+    pet.parentNode.appendChild(h);setTimeout(function(){h.remove()},1000);
+  }
+  function tap(){
+    if(S.sleep){talk("Shh, sleeping...");return}
+    bounce();heart();S.f=clamp(S.f+3);talk("Hehe!",1800);render();save();
+  }
+  pet.addEventListener("click",tap);
+  pet.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();tap()}});
+  $("feed").onclick=function(){
+    if(S.sleep){talk("Wake me first!");return}
+    if(S.h>=95){talk("I'm full!");return}
+    S.h=clamp(S.h+30);bounce();heart("🍙");talk("Yum yum!");render();save();
+  };
+  $("play").onclick=function(){
+    if(S.sleep){talk("Wake me first!");return}
+    if(S.e<15){talk("Too tired to play...");return}
+    S.f=clamp(S.f+25);S.e=clamp(S.e-8);S.h=clamp(S.h-4);bounce();heart("★");talk("Wheee!");render();save();
+  };
+  $("sleep").onclick=function(){
+    S.sleep=!S.sleep;talk(S.sleep?"Good night...":"Good morning!");render();save();
+  };
+  nameEl.addEventListener("change",function(){S.name=nameEl.value.trim()||"Mochi";nameEl.value=S.name;document.title=S.name+", your desk pet";save()});
+  setInterval(function(){step(1);render();if(Math.random()<0.1)save()},1000);
+  document.addEventListener("visibilitychange",function(){
+    if(document.visibilityState==="visible"){var g=Math.min((Date.now()-S.t)/1000,6*3600);if(g>2)step(g);render();}
+    else save();
+  });
+  render();save();
+})();
+</script>
+</body>
+</html>
